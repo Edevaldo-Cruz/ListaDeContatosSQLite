@@ -22,15 +22,25 @@ class ContatoActivity : BaseActivity() {
     }
 
     private fun setupContato(){
+        progress.visibility = View.VISIBLE
         idContato = intent.getIntExtra("index",-1)
         if (idContato == -1){
             btnExcluirContato.visibility = View.GONE
             return
         }
-        var lista = ContatoApplication.instance.helperDB?.buscarContatos("$idContato", true) ?: return
-        var contato = lista.getOrNull(0) ?: return
-        etNome.setText(contato.nome)
-        etTelefone.setText(contato.telefone)
+        Thread(Runnable {
+            Thread.sleep(1500)
+            var lista = ContatoApplication.instance.helperDB?.buscarContatos("$idContato", true) ?: return@Runnable
+            var contato = lista.getOrNull(0) ?: return@Runnable
+            runOnUiThread {
+                etNome.setText(contato.nome)
+                etTelefone.setText(contato.telefone)
+                progress.visibility = View.GONE
+            }
+        }).start()
+
+
+
     }
 
     private fun onClickSalvarContato(){
