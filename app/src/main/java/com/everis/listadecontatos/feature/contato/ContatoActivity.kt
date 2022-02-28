@@ -22,12 +22,12 @@ class ContatoActivity : BaseActivity() {
     }
 
     private fun setupContato(){
-        progress.visibility = View.VISIBLE
         idContato = intent.getIntExtra("index",-1)
         if (idContato == -1){
             btnExcluirContato.visibility = View.GONE
             return
         }
+        progress.visibility = View.VISIBLE
         Thread(Runnable {
             Thread.sleep(1500)
             var lista = ContatoApplication.instance.helperDB?.buscarContatos("$idContato", true) ?: return@Runnable
@@ -51,18 +51,33 @@ class ContatoActivity : BaseActivity() {
             nome,
             telefone
         )
-        if(idContato == -1) {
-            ContatoApplication.instance.helperDB?.salvarContato(contato)
-        }else{
-            ContatoApplication.instance.helperDB?.updateContato(contato)
-        }
-        finish()
+        progress.visibility = View.VISIBLE
+        Thread(Runnable {
+            Thread.sleep(1500)
+            if(idContato == -1) {
+                ContatoApplication.instance.helperDB?.salvarContato(contato)
+            }else{
+                ContatoApplication.instance.helperDB?.updateContato(contato)
+            }
+            runOnUiThread {
+                progress.visibility = View.GONE
+                finish()
+            }
+        }).start()
+
     }
 
     fun onClickExcluirContato(view: View) {
         if(idContato > -1){
-            ContatoApplication.instance.helperDB?.deletarContato(idContato)
-            finish()
+            progress.visibility = View.VISIBLE
+            Thread(Runnable {
+                Thread.sleep(1500)
+                ContatoApplication.instance.helperDB?.deletarContato(idContato)
+                runOnUiThread {
+                    progress.visibility = View.GONE
+                    finish()
+                }
+            }).start()
         }
     }
 }
